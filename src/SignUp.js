@@ -17,6 +17,10 @@ import { actionTypes } from "./reducer.js";
 import { useStateValue } from "./StateProvider";
 import { db, storage, auth, googleProvider } from "./firebase";
 import { Redirect } from "react-router-dom";
+import { Radio } from "@material-ui/core";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
 
 const useStyles = makeStyles((theme) => ({
   signup_root: {
@@ -67,6 +71,12 @@ export default function SignUp(props) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [{ user }, dispatch] = useStateValue();
+
+  const [userRole, setUserRole] = React.useState("Parking Zone Assistant");
+
+  const handleUserRoleChange = (event) => {
+    setUserRole(event.target.value);
+  };
 
   const loginAsGuest = () => {
     dispatch({
@@ -147,6 +157,9 @@ export default function SignUp(props) {
                   });
               }
             });
+          db.collection("user_role")
+            .doc(authUser.user.uid)
+            .set({ uid: authUser.user.uid, role: userRole });
         }
       })
       .catch((err) => {
@@ -238,10 +251,26 @@ export default function SignUp(props) {
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive inspiration, marketing promotions and updates via email."
-              />
+              <FormControl component="fieldset">
+                <FormLabel component="legend">Select Your Role</FormLabel>
+                <RadioGroup
+                  aria-label="Role"
+                  name="user_role"
+                  value={userRole}
+                  onChange={handleUserRoleChange}
+                >
+                  <FormControlLabel
+                    value="Booking Counter Agent"
+                    control={<Radio />}
+                    label="Booking Counter Agent"
+                  />
+                  <FormControlLabel
+                    value="Parking Zone Assistant"
+                    control={<Radio />}
+                    label="Parking Zone Assistant"
+                  />
+                </RadioGroup>
+              </FormControl>
             </Grid>
           </Grid>
           <Button
@@ -254,7 +283,12 @@ export default function SignUp(props) {
             Sign Up
           </Button>
 
-          <div className={classes.gButton} onClick={props.googleLogin}>
+          <div
+            className={classes.gButton}
+            onClick={() => {
+              props.googleLogin(userRole);
+            }}
+          >
             <GoogleButton />
           </div>
 

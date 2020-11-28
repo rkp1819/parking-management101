@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import firebase from "firebase";
 //Components
 import AppBar from "./AppBar";
-import AdvancedGrid from "./AdvancedGrid";
 import Login from "./Login";
 import EmailVerification from "./EmailVerification";
-import ProfileStatistics from "./ProfileStatistics";
-import ImageGrid from "./ImageGrid";
+import Dashboard from "./Dashboard";
+
 //Styles
 import "./App.css";
 //Keys and State variables
@@ -56,11 +55,7 @@ function App() {
       user.emailVerified || user == "guest" ? (
         <div className="app">
           <AppBar />
-          <AdvancedGrid />
-          <ProfileStatistics />
-          <ImageGrid />
-
-          {/* testing stuff */}
+          <Dashboard />
         </div>
       ) : (
         <EmailVerification />

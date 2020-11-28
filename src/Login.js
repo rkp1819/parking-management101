@@ -9,11 +9,12 @@ import firebase from "firebase";
 
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
+import { MergeType } from "@material-ui/icons";
 
 function Login() {
   const [{ user }, dispatch] = useStateValue();
 
-  const googleLogin = () => {
+  const googleLogin = (userRole) => {
     auth
       .signInWithPopup(googleProvider)
       .then((result) => {
@@ -21,7 +22,7 @@ function Login() {
           .where("email", "==", result.user.email)
           .get()
           .then((snapshot) => {
-            if (snapshot.exists) {
+            if (snapshot.exits) {
               dispatch({
                 type: actionTypes.SET_USER,
                 user: {
@@ -52,6 +53,11 @@ function Login() {
                 );
             }
           });
+        if (typeof userRole == "string") {
+          db.collection("user_role")
+            .doc(result.user.uid)
+            .set({ uid: result.user.uid, role: userRole }, { merge: true });
+        }
       })
       .catch((err) => {
         alert(err.message);
