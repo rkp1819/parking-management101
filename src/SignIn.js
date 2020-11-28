@@ -99,7 +99,7 @@ export default function SignIn(props) {
             });
           }}
         >
-          LikhitPhotography
+          Parking Management
         </Link>{" "}
         {new Date().getFullYear()}
         {"."}

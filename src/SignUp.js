@@ -95,7 +95,7 @@ export default function SignUp(props) {
             });
           }}
         >
-          LikhitPhotography
+          Parking Management
         </Link>{" "}
         {new Date().getFullYear()}
         {"."}
