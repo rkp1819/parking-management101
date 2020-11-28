@@ -1,0 +1,104 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.root {
+  height: min-content;
+  width: 100%;
+  background-color: rgb(245, 245, 245);
+}
+
+.container {
+  padding: 0 2% 3% 2%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  float: none;
+  height: 100%;
+}
+.heading {
+  text-align: center;
+  margin: 0 auto;
+  font-size: 3.5em;
+  margin-top: 5%;
+  text-align: center;
+  text-transform: uppercase;
+  text-rendering: optimizeLegibility;
+  color: #2c2c2c;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  letter-spacing: 0.05em;
+  text-shadow: 4px 4px 0px #d5d5d5, 7px 7px 0px rgba(0, 0, 0, 0.2);
+}
+.counter {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin-top: 3%;
+  width: 100vw;
+  max-width: 100%;
+  justify-content: space-between;
+}
+.counter .item {
+  vertical-align: middle;
+  width: auto;
+  height: 100%;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+.counter .item > .MuiSvgIcon-root {
+  color: grey;
+  font-size: 5rem !important;
+}
+.counter .item i {
+  color: rgba(25, 25, 25, 0.9);
+  font-size: 4em;
+  text-shadow: 1px 1px 1px #ccc;
+}
+.counter .item p.number {
+  color: rgba(21, 21, 21, 1);
+  font-size: 3em;
+  text-shadow: 1px 1px 1px #ccc;
+}
+.counter .item p.label {
+  color: rgba(25, 25, 25, 0.9);
+  font-size: 1.1em;
+  text-shadow: 1px 1px 1px #ccc;
+}
+.counter .item:hover i,
+.counter .item:hover p {
+  color: rgba(10, 10, 10, 1);
+}
+
+@media (max-width: 786px) {
+  .heading {
+    font-family: "Times New Roman", Times, serif;
+    text-align: center;
+    padding: 2%;
+    padding-bottom: 10%;
+    text-align: center;
+    text-transform: uppercase;
+    text-rendering: optimizeLegibility;
+    font-size: 3.5em;
+  }
+  .counter {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+    align-items: center;
+    margin-top: 3%;
+    width: 100vw;
+    max-width: 100%;
+    justify-content: space-between;
+  }
+  .counter .item {
+    margin: 2% 0;
+    flex: 0 0 50%;
+  }
+  .counter .item > .MuiSvgIcon-root {
+    color: grey;
+    font-size: 5rem !important;
+  }
+}
