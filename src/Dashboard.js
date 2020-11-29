@@ -8,7 +8,43 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
+import Dialog from "./Dialog";
 import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles({
+  occupied: {
+    backgroundColor: "lightgray",
+    margin: "1%",
+    padding: "1%",
+    display: "flex",
+    flexDirection: "row",
+    flex: "1",
+    justifyContent: "space-between",
+    alignItems: "center",
+    overFlow: "scroll",
+  },
+  notOccupied: {
+    backgroundColor: "lightgreen",
+    margin: "1%",
+    padding: "1%",
+    display: "flex",
+    flexDirection: "row",
+    flex: "1",
+    justifyContent: "space-between",
+    alignItems: "center",
+    overFlow: "scroll",
+  },
+  heroContent: {
+    margin: "2%",
+    padding: "2%",
+    display: "flex",
+    flexDirection: "row",
+    flex: "1",
+    justifyContent: "space-between",
+    alignItems: "center",
+    overFlow: "scrool",
+  },
+});
 
 function Dashboard() {
   const [
@@ -18,44 +54,15 @@ function Dashboard() {
 
   const [initialized, setInitialized] = React.useState(false);
   const [zone, setZone] = React.useState("None");
-  const [role, setRole] = React.useState("None");
+  const [role, setRole] = React.useState("Guest");
   const handleZoneChange = (event) => {
     setZone(event.target.value);
   };
-
-  const useStyles = makeStyles({
-    occupied: {
-      backgroundColor: "lightgray",
-      margin: "1%",
-      padding: "1%",
-      display: "flex",
-      flexDirection: "row",
-      flex: "1",
-      justifyContent: "space-between",
-      alignItems: "center",
-      overFlow: "scroll",
-    },
-    notOccupied: {
-      backgroundColor: "lightgreen",
-      margin: "1%",
-      padding: "1%",
-      display: "flex",
-      flexDirection: "row",
-      flex: "1",
-      justifyContent: "space-between",
-      alignItems: "center",
-      overFlow: "scroll",
-    },
-    heroContent: {
-      margin: "2%",
-      padding: "2%",
-      display: "flex",
-      flexDirection: "row",
-      flex: "1",
-      justifyContent: "space-between",
-      alignItems: "center",
-      overFlow: "scrool",
-    },
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [parkingSpace, setParkingSpace] = React.useState({
+    spaceTitle: "",
+    occupied: "",
+    occupiedBy: "",
   });
 
   const classes = useStyles();
@@ -66,26 +73,62 @@ function Dashboard() {
       type: actionTypes.SET_PARKINGZONEDATA,
       parkingZoneData: ["A", "B", "C"],
     });
+    if (role == "Booking Counter Agent") {
+      db.collection("vehicle_parking")
+        .get()
+        .then((res) => {
+          res.forEach((element) => {
+            element.ref.delete();
+          });
+        });
+    } else {
+      alert("Only Booking Counter Agent can Perform this.");
+    }
+  }
+
+  const loadTransactions = () => {
     db.collection("vehicle_parking")
       .get()
       .then((res) => {
         res.forEach((element) => {
-          element.ref.delete();
+          element.ref.get().then((snapshot) => {
+            if (snapshot.exists && snapshot.data().spaceTitle) {
+              //copy to local
+              let obj = parkingSpaceData;
+              obj[snapshot.data().spaceTitle[0]][
+                snapshot.data().spaceTitle[1] - 1
+              ].occupied = true;
+              obj[snapshot.data().spaceTitle[0]][
+                snapshot.data().spaceTitle[1] - 1
+              ].occupiedBy = snapshot.data().vehicle_id;
+
+              dispatch({
+                type: actionTypes.SET_PARKINGSPACEDATA,
+                parkingSpaceData: obj,
+              });
+            }
+          });
         });
       });
-  }
+  };
 
   React.useEffect(() => {
+    dispatch({
+      type: actionTypes.SET_PARKINGZONEDATA,
+      parkingZoneData: ["A", "B", "C"],
+    });
+
     db.collection("user_role")
       .doc(user.uid)
       .get()
       .then((snapshot) => {
         if (snapshot.exists) {
-          console.log(snapshot.data().role);
           setRole(snapshot.data().role);
         }
       })
       .catch();
+
+    loadTransactions();
   }, []);
   React.useEffect(() => {
     let obj = {};
@@ -105,7 +148,6 @@ function Dashboard() {
   }, [parkingZoneData]);
 
   React.useEffect(() => {
-    console.log("parkingSpaceData[zone]" + parkingSpaceData[zone]);
     dispatch({
       type: actionTypes.SET_DISPLAYSPACEDATA,
       displaySpaceData: parkingSpaceData[zone] ? parkingSpaceData[zone] : [],
@@ -115,7 +157,6 @@ function Dashboard() {
   React.useEffect(() => {}, [displaySpaceData]);
 
   const register = (spaceTitle, vehicle_id) => {
-    console.log(spaceTitle);
     db.collection("vehicle_parking")
       .doc(vehicle_id)
       .get()
@@ -146,7 +187,6 @@ function Dashboard() {
       .catch();
   };
   const unRegister = (spaceTitle, vehicle_id) => {
-    console.log(spaceTitle);
     db.collection("vehicle_parking")
       .doc(vehicle_id)
       .get()
@@ -173,6 +213,16 @@ function Dashboard() {
       .catch();
   };
 
+  const makeAmove = (registrationId) => {
+    setOpenDialog(false);
+    if (registrationId) {
+      if (parkingSpace.occupied) {
+        unRegister(parkingSpace.spaceTitle, registrationId);
+      } else {
+        register(parkingSpace.spaceTitle, registrationId);
+      }
+    }
+  };
   return (
     <div>
       <Paper elevation={3} className={classes.heroContent}>
@@ -214,7 +264,14 @@ function Dashboard() {
                 <Button
                   color={"secondary"}
                   onClick={() => {
-                    unRegister(item.spaceTitle, "123");
+                    if (role == "Booking Counter Agent") {
+                      setParkingSpace(item);
+                      setOpenDialog(true);
+                    } else {
+                      alert(
+                        "Only Booking Counter Agent can Perform this action."
+                      );
+                    }
                   }}
                 >
                   UnRegister
@@ -223,7 +280,14 @@ function Dashboard() {
                 <Button
                   color={"primary"}
                   onClick={() => {
-                    register(item.spaceTitle, "123");
+                    if (role == "Booking Counter Agent") {
+                      setParkingSpace(item);
+                      setOpenDialog(true);
+                    } else {
+                      alert(
+                        "Only Booking Counter Agent can Perform this action."
+                      );
+                    }
                   }}
                 >
                   Register
@@ -233,6 +297,12 @@ function Dashboard() {
           </Grid>
         );
       })}
+      <Dialog
+        setOpen={setOpenDialog}
+        open={openDialog}
+        occupied={parkingSpace.occupied}
+        makeAmove={makeAmove}
+      />
     </div>
   );
 }
