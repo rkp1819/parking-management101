@@ -67,6 +67,8 @@ function Dashboard() {
 
   const classes = useStyles();
 
+  //deletes transactions and kickstarts the app
+
   function initialize() {
     setInitialized(true);
     dispatch({
@@ -85,6 +87,8 @@ function Dashboard() {
       alert("Only Booking Counter Agent can Perform this.");
     }
   }
+
+  //loads transactions from db - remote sync
 
   const loadTransactions = () => {
     db.collection("vehicle_parking")
@@ -116,6 +120,7 @@ function Dashboard() {
       });
   };
 
+  //   triggers on component mount
   React.useEffect(() => {
     dispatch({
       type: actionTypes.SET_PARKINGZONEDATA,
@@ -134,6 +139,7 @@ function Dashboard() {
 
     loadTransactions();
   }, []);
+
   React.useEffect(() => {
     let obj = {};
     parkingZoneData.forEach((zone) => {
@@ -164,6 +170,7 @@ function Dashboard() {
 
   React.useEffect(() => {}, [displaySpaceData]);
 
+  //Register a vehicle
   const register = (spaceTitle, vehicle_id) => {
     db.collection("vehicle_parking")
       .doc(vehicle_id)
@@ -194,6 +201,8 @@ function Dashboard() {
       })
       .catch();
   };
+
+  //   unRegister a vehicle
   const unRegister = (spaceTitle, vehicle_id) => {
     db.collection("vehicle_parking")
       .doc(vehicle_id)
@@ -221,6 +230,7 @@ function Dashboard() {
       .catch();
   };
 
+  //make a move to register or unregister
   const makeAmove = (registrationId) => {
     setOpenDialog(false);
     if (registrationId) {
@@ -231,6 +241,8 @@ function Dashboard() {
       }
     }
   };
+
+  //   render to the UI
   return (
     <div>
       <Paper elevation={3} className={classes.heroContent}>
