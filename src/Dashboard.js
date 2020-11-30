@@ -94,18 +94,22 @@ function Dashboard() {
           element.ref.get().then((snapshot) => {
             if (snapshot.exists && snapshot.data().spaceTitle) {
               //copy to local
-              let obj = parkingSpaceData;
-              obj[snapshot.data().spaceTitle[0]][
-                snapshot.data().spaceTitle[1] - 1
-              ].occupied = true;
-              obj[snapshot.data().spaceTitle[0]][
-                snapshot.data().spaceTitle[1] - 1
-              ].occupiedBy = snapshot.data().vehicle_id;
 
-              dispatch({
-                type: actionTypes.SET_PARKINGSPACEDATA,
-                parkingSpaceData: obj,
-              });
+              let obj = parkingSpaceData;
+              if (obj.hasOwnProperty(snapshot.data().spaceTitle[0])) {
+                obj[snapshot.data().spaceTitle[0]][
+                  snapshot.data().spaceTitle[1] - 1
+                ].occupied = true;
+                obj[snapshot.data().spaceTitle[0]][
+                  snapshot.data().spaceTitle[1] - 1
+                ].occupiedBy = snapshot.data().vehicle_id;
+              }
+
+              if (obj != parkingSpaceData)
+                dispatch({
+                  type: actionTypes.SET_PARKINGSPACEDATA,
+                  parkingSpaceData: obj,
+                });
             }
           });
         });
@@ -153,6 +157,10 @@ function Dashboard() {
       displaySpaceData: parkingSpaceData[zone] ? parkingSpaceData[zone] : [],
     });
   }, [parkingSpaceData, zone]);
+
+  React.useEffect(() => {
+    loadTransactions();
+  }, [parkingSpaceData]);
 
   React.useEffect(() => {}, [displaySpaceData]);
 

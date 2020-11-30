@@ -74,7 +74,6 @@ export default function SignIn(props) {
           type: actionTypes.SET_USER,
           user: authUser.user,
         });
-        
       })
       .catch((err) => {
         alert(err.message);

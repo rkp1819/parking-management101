@@ -8,7 +8,7 @@ const firebaseConfig = {
   storageBucket: "parking-management101.appspot.com",
   messagingSenderId: "127679383823",
   appId: "1:127679383823:web:8a31a592bedc19ebdd567a",
-  measurementId: "G-T12WTCN8P9"
+  measurementId: "G-T12WTCN8P9",
 };
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
